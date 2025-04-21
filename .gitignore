@@ -11,3 +11,5 @@
 !types.c
 !types.h
 !.gitignore
+!tri.c
+!tri.h
