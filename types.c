@@ -59,6 +59,8 @@ t_date getDateMaintenant(Tstation *mystation) {
     return mystation->dateDerniereMaintenance;
 }
 
+//getteurs bus
+
 int getPosXBus( Tbus myBus ){
     return myBus->posXBus;
 }
