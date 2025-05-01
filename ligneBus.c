@@ -349,3 +349,56 @@ void afficheCoordonneesBus( Tbus myBus ){
 
 
 //Cr�er ci-dessous vos fonctions
+
+#define fichier "sauvegarde.data"
+#define erreur "log.txt"
+
+//ecrit dans le fichier de sauvegarde les donnees des station d'une ligne
+//les stations sont dans l'ordre, ce qui permettra de reconstituer la liste chainee lors du chargement
+void sauvegardeLigne(TlisteStation ligne, TlisteStation positionBus) {
+    FILE *f_save = fopen(fichier, "wb");
+
+    if(f_save == NULL) {
+        FILE *f_log = fopen(erreur, "w");
+        fprintf(f_log, "Erreur a l'ouverture du fichier %s\n", fichier);
+        fclose(f_log);
+
+        return EXIT_FAILURE;
+    }
+
+    TlisteStation position = ligne;
+
+    while(position->suiv != NULL) {
+        Tstation copie = *(position->pdata);
+
+        //on met la valeur null dans les pointeurs pour eviter de charger des pointeur incorrects
+        copie.depart = NULL;
+        copie.arrivee = NULL;
+
+        //si le bus etait sur cet emplacement, on marque l'emplacement pour restituer la position du bus lors du chargement
+        //le pointeur prendra ensuite une valeur lors de la constitution de la liste chainee
+        if(position == positionBus) {
+            copie.depart = 1;
+        }
+    
+        //ecrit le contenu de la structure Tstation dans le fichier de sauvegarde
+        fwrite(&copie, sizeof(Tstation), 1, f_save);
+
+        position = position->suiv;
+    }
+
+    fclose(f_save);
+}
+
+//en cours de redaction
+void sauvegarde(TlisteStation ligne, Tbus bus) {
+    TlisteStation positionBus = bus->positionSurLaLigneDeBus;
+
+    sauvegardeLigne(ligne, positionBus);
+
+}
+
+//lit dans le fichier de sauvegarde les donnees du bus et des lignes.
+void chargement() {
+
+}
