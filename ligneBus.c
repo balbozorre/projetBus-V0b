@@ -64,11 +64,14 @@ Tstation *creeTroncon(int idLigneBus, Tstation* depart, Tstation *arrivee, int c
 
     return newStation;
 }
+
+//genere une date aleatoire
 t_date creerDate(){
-    t_date a = {getRandomValue(1, 31), getRandomValue(1, 12), 2025};
+    t_date a = {getRandomValue(1, 31), getRandomValue(1, 12), getRandomValue(2000, 2025)};
     return a;
 }
 
+//calcule la distance entre deux stations
 int calculDistance(Tstation *a, Tstation *b) {
     int x = getPosXStation(b) - getPosXStation(a);
     int y = getPosYStation(b) - getPosYStation(a);
@@ -78,6 +81,7 @@ int calculDistance(Tstation *a, Tstation *b) {
 TlisteStation creeLigneDeBus1(){
     TlisteStation newLigne;
     Tstation *dep,*troncon,*arr;
+    int distance;
 
     initListe(&newLigne);
 
@@ -85,7 +89,8 @@ TlisteStation creeLigneDeBus1(){
     //modif
     dep = creeArret(10,10,"Charles de Gaulle",1, getRandomValue(10, 100), creerDate());
     arr = creeArret(300,400,"Jules Ferry",2, getRandomValue(10, 100), creerDate());
-    troncon = creeTroncon(1,dep,arr,35,280, getRandomValue(10, 100), creerDate());
+    distance = calculDistance(dep, arr);
+    troncon = creeTroncon(1,dep,arr,distance,distance, getRandomValue(10, 100), creerDate());
 
     //ajout de ces stations et troncons dans la liste doublement chain_e  (champ pdata)
     newLigne = ajoutEnFin(newLigne, dep);  //donc la t_te)
@@ -93,16 +98,19 @@ TlisteStation creeLigneDeBus1(){
     newLigne = ajoutEnFin(newLigne, arr);
 
     dep = creeArret(10,410,"Jacques Brel",3, getRandomValue(10, 100), creerDate());
+    distance = calculDistance(arr, dep);
     troncon = creeTroncon(1,arr,dep,40,160, getRandomValue(10, 100), creerDate());
     newLigne = ajoutEnFin(newLigne, troncon);
     newLigne = ajoutEnFin(newLigne, dep);
 
     arr = creeArret(200,350,"Saint Exupery",4, getRandomValue(10, 100), creerDate());
+    distance = calculDistance(dep, arr);
     troncon = creeTroncon(1,dep,arr,45,200, getRandomValue(10, 100), creerDate());
     newLigne = ajoutEnFin(newLigne, troncon);
     newLigne = ajoutEnFin(newLigne, arr);
 
     dep = creeArret(500,410,"Stalingrad",5, getRandomValue(10, 100), creerDate());
+    distance = calculDistance(arr, dep);
     troncon = creeTroncon(1,arr,dep,40,160, getRandomValue(10, 100), creerDate());
     newLigne = ajoutEnFin(newLigne, troncon);
     newLigne = ajoutEnFin(newLigne, dep);
