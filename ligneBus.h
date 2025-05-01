@@ -5,9 +5,8 @@
 #include "types.h"
 
 Tbus creeBus( int idBus, TlisteStation start );
-int getRandomValue(int min, int max);
-Tstation *creeArret( int posX, int posY, char* nomStation, int idStation);
-Tstation *creeTroncon( int idLigneBus, Tstation* depart, Tstation *arrivee, int coutTemps, int coutDistance);
+Tstation *creeArret( int posX, int posY, char* nomStation, int idStation, int coutM, t_date dateDerniereM);
+Tstation *creeTroncon( int idLigneBus, Tstation* depart, Tstation *arrivee, int coutTemps, int coutDistance, int coutM, t_date dateDerniereM);
 
 //TlisteStation* initReseauLignesDeBus(int *nbLignes);
 TlisteStation creeLigneDeBus1(void);
@@ -34,5 +33,6 @@ void afficheCoordonneesBus( Tbus myBus );
 
 // ****   Lister ci-dessous vos fonctions  ****
 
+t_date creerDate();
 
 #endif // LIGNEBUS_H_INCLUDED

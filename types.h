@@ -2,13 +2,11 @@
 #define TYPES_H_INCLUDED
 
 typedef enum type_noeud {ARRET, TRONCON} TypeNoeud;
-
-typedef struct {
+typedef struct{
     int jour;
     int mois;
     int annee;
-} t_date;
-
+}t_date;
 typedef struct T_station { //représente UN TRONCON (entre deux arrêts) ou UN ARRET (cad une station de la ligne de bus)
 
     TypeNoeud arret_ou_troncon;
@@ -27,8 +25,8 @@ typedef struct T_station { //représente UN TRONCON (entre deux arrêts) ou UN ARR
     int idStation;                     //numéro unique et non liée à une ligne, une ligne de bus étant constituée d'une suite de d'id stations: exemple : 3  - 7 - 1 - 5
 
     //champs utiles pour les tris
-    int coutMaintenance;                //en Kilo euro, une valeur entre 10 et 100  (A VOUS DE GERER)
-    t_date dateDerniereMaintenance;      //t_date est à définir, doit permettre de stocker une date jour/mois/année, y mettre une date aléatoire (A VOUS DE GERER)
+    int coutMaintenance;//int coutMaintenance;                //en Kilo euro, une valeur entre 10 et 100  (A VOUS DE GERER)
+    t_date dateDerniereMaintenance;//t_date dateDerniereMaintenance      //t_date est à définir, doit permettre de stocker une date jour/mois/année, y mettre une date aléatoire (A VOUS DE GERER)
 
     //struct T_station* correspondances; //égale à NULL si pas de correspondance, sinon égale à une liste de TRONCONS
     //int coutCumule;                    //pour le calcul du plus court chemin, algo de Djikstra
@@ -68,6 +66,8 @@ typedef struct{
 
 typedef Typebus *Tbus;
 
+//valeur aleatoire
+int getRandomValue(int min, int max);
 //affichage
 void afficheStation( Tstation *station );
 
@@ -78,9 +78,11 @@ int getPosXStation( Tstation *myStation );
 int getPosYStation( Tstation *myStation );
 int getIdLigneTroncon(Tstation *myStation);
 TypeNoeud getTypeNoeud(Tstation *myStation);
+//ajouts
 int getCoutMaintenance(Tstation *myStation);
-t_date getDateMaintenant(Tstation *mystation);
+t_date getDateMaintenance(Tstation *myStation);
 
+t_date getDateMaintenance(Tstation *myStation);
 int getPosXBus( Tbus myBus );
 int getPosYBus( Tbus myBus );
 int getIdBus( Tbus myBus );
@@ -89,6 +91,7 @@ TsensParcours getSensParcours(Tbus myBus);
 TlisteStation getActualStation( Tbus myBus );
 int getIdLigneBus(Tbus myBus);
 
+
 //Setteurs
 void setActualStation( Tbus myBus, TlisteStation arrivalStation );
 void setPosXBus(Tbus myBus, int newX);
@@ -96,7 +99,9 @@ void setPosYBus(Tbus myBus, int newY);
 void setIdLigneBus(Tbus myBus, int idLigne);
 void setSensParcours(Tbus myBus, TsensParcours sens );
 void setPositionSurLaLigneDeBus( Tbus myBus, TlisteStation myStation);
-void setCoutMaintenance(Tstation *myStation, int coutM);
-void setDateMaintenant(Tstation *mystation, t_date d);
+
+//ajouts
+void setCoutMaintenance(Tstation *myStation, int coutMaintenance);
+void setDateMaintenance(Tstation *myStation, t_date d);
 
 #endif // TYPES_H_INCLUDED

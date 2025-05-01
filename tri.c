@@ -1,37 +1,70 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "tri.h"
+#include "types.h"
 
-void swap(T_liste a, T_liste b) {
-    struct T_cell *suiv_b = b->suiv;
-    struct T_cell *prec_b = b->prec;
-
-    b->prec = a->prec;
-    b->suiv = a->suiv;
-
-    a->prec = prec_b;
-    a->suiv = suiv_b;
+int comparer_maintenance(Tstation *a, Tstation *b) {
+    return b->coutMaintenance - a->coutMaintenance;
 }
 
-bool A_avant_B(t_date A, t_date B) {
-    if (A.annee < B.annee)
-        return true;
-    else if (A.annee > B.annee)
-        return false;
-
-    if (A.mois < B.mois)
-        return true;
-    else if (A.mois > B.mois)
-        return false;
-
-    if (A.jour < B.jour)
-        return true;
-
-    return false;
+int comparer_date_maintenance(Tstation *a, Tstation *b) {
+    if (a->dateDerniereMaintenance.annee != b->dateDerniereMaintenance.annee)
+        return a->dateDerniereMaintenance.annee - b->dateDerniereMaintenance.annee;
+    if (a->dateDerniereMaintenance.mois != b->dateDerniereMaintenance.mois)
+        return a->dateDerniereMaintenance.mois - b->dateDerniereMaintenance.mois;
+    return a->dateDerniereMaintenance.jour - b->dateDerniereMaintenance.jour;
 }
 
-bool cout_nodeAInfNodeB(Tstation *nodeA, Tstation *nodeB) {
-    return *nodeA->coutMaintenance <= *nodeB->coutMaintenance;
+void trier_liste_station(T_liste *liste, int (*compar)(Tstation*, Tstation*)) {
+    if (!liste || !(*liste))
+        return;
+
+    T_liste sorted = NULL;
+
+    while (*liste) {
+        T_liste current = *liste;
+        *liste = (*liste)->suiv;
+
+        current->prec = current->suiv = NULL;
+
+        if (!sorted) {
+            sorted = current;
+        } else {
+            T_liste temp = sorted;
+            T_liste prev = NULL;
+
+            while (temp && compar(current->pdata, temp->pdata) > 0) {
+                prev = temp;
+                temp = temp->suiv;
+            }
+
+            if (!prev) {
+                current->suiv = sorted;
+                sorted->prec = current;
+                sorted = current;
+            } else {
+                current->suiv = prev->suiv;
+                current->prec = prev;
+                if (prev->suiv) prev->suiv->prec = current;
+                prev->suiv = current;
+            }
+        }
+    }
+
+    *liste = sorted;
 }
 
-bool date_nodeAInfNodeB(Tstation *nodeA, Tstation *nodeB) {
-    return *nodeA->dateDerniereMaintenance <= *nodeB->coutMaintenance;
+void afficher_liste(T_liste liste) {
+    while (liste) {
+        printf("Station %s | Cout : %d k€ | Derniere maintenance : %02d/%02d/%d\n",
+            liste->pdata->nomStation,
+            liste->pdata->coutMaintenance,
+            liste->pdata->dateDerniereMaintenance.jour,
+            liste->pdata->dateDerniereMaintenance.mois,
+            liste->pdata->dateDerniereMaintenance.annee);
+        liste = liste->suiv;
+    }
 }
+

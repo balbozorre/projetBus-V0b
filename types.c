@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <time.h>
 #include "types.h"
 
 void afficheStation( Tstation *station){
@@ -18,6 +18,10 @@ void afficheStation( Tstation *station){
             printf("\nfin tronçon\n");
         }
     }
+}
+//Ajout
+int getRandomValue(int min, int max) {
+    return rand() % (max - min + 1) + min;
 }
 
 // Getteurs
@@ -50,16 +54,15 @@ int getIdLigneTroncon(Tstation *myStation){
 TypeNoeud getTypeNoeud(Tstation *myStation){
     return myStation->arret_ou_troncon;
 }
-
+//Ajouts
 int getCoutMaintenance(Tstation *myStation) {
     return myStation->coutMaintenance;
 }
 
-t_date getDateMaintenant(Tstation *mystation) {
-    return mystation->dateDerniereMaintenance;
+t_date getDateMaintenance(Tstation *myStation) {
+    return myStation->dateDerniereMaintenance;
 }
 
-//getteurs bus
 
 int getPosXBus( Tbus myBus ){
     return myBus->posXBus;
@@ -81,8 +84,6 @@ int getIdLigneBus(Tbus myBus){
 TsensParcours getSensParcours(Tbus myBus){
     return myBus->sensParcours;
 }
-
-
 
 
 
@@ -115,11 +116,11 @@ void setSensParcours(Tbus myBus, TsensParcours sens ){
 void setPositionSurLaLigneDeBus( Tbus myBus, TlisteStation myStation){
     myBus->positionSurLaLigneDeBus = myStation;
 }
-
+//Ajouts
 void setCoutMaintenance(Tstation *myStation, int coutM) {
     myStation->coutMaintenance = coutM;
 }
 
-void setDateMaintenant(Tstation *mystation, t_date d) {
-    mystation->dateDerniereMaintenance = d;
+void setDateMaintenance(Tstation *myStation, t_date d) {
+    myStation->dateDerniereMaintenance = d;
 }
