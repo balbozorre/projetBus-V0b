@@ -33,7 +33,11 @@ void afficheCoordonneesBus( Tbus myBus );
 
 // ****   Lister ci-dessous vos fonctions  ****
 
+//fonctions generales
 t_date creerDate();
 int calculDistance(Tstation *a, Tstation *b);
+
+//sauvegarde et chargement via un fichier
+void sauvegardeLigne(TlisteStation ligne);
 
 #endif // LIGNEBUS_H_INCLUDED

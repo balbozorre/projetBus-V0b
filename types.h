@@ -9,6 +9,7 @@ typedef struct{
     int mois;
     int annee;
 }t_date;
+
 typedef struct T_station { //repr�sente UN TRONCON (entre deux arr�ts) ou UN ARRET (cad une station de la ligne de bus)
 
     TypeNoeud arret_ou_troncon;
@@ -27,8 +28,8 @@ typedef struct T_station { //repr�sente UN TRONCON (entre deux arr�ts) ou UN
     int idStation;                     //num�ro unique et non li�e � une ligne, une ligne de bus �tant constitu�e d'une suite de d'id stations: exemple : 3  - 7 - 1 - 5
 
     //champs utiles pour les tris
-    int coutMaintenance;//int coutMaintenance;                //en Kilo euro, une valeur entre 10 et 100  (A VOUS DE GERER)
-    t_date dateDerniereMaintenance;//t_date dateDerniereMaintenance      //t_date est � d�finir, doit permettre de stocker une date jour/mois/ann�e, y mettre une date al�atoire (A VOUS DE GERER)
+    int coutMaintenance;                //en Kilo euro, une valeur entre 10 et 100  (A VOUS DE GERER)
+    t_date dateDerniereMaintenance;      //t_date est � d�finir, doit permettre de stocker une date jour/mois/ann�e, y mettre une date al�atoire (A VOUS DE GERER)
 
     //struct T_station* correspondances; //�gale � NULL si pas de correspondance, sinon �gale � une liste de TRONCONS
     //int coutCumule;                    //pour le calcul du plus court chemin, algo de Djikstra
