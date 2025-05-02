@@ -456,6 +456,10 @@ void chargement(Tbus bus, TlisteStation ligne) {
         return EXIT_FAILURE;
     }
 
+    //to-do
+    //besoin de corriger l'enregistrement de la structure tbus
+    //il faut lier le bus a sa position en verifiant le pointeur suivant pour trouver un 1
+    //il faut reconstruire la liste chainee, avec une boucle for apres avoir lu le nbr de station
     /*
     sauv_bus = creeBus( int idBus, TlisteStation start ) fread(&(*sauv_bus), sizeof(Typebus), 1, f_save);
     */
