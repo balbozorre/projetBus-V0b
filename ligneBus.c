@@ -353,20 +353,45 @@ void afficheCoordonneesBus( Tbus myBus ){
 #define fichier "sauvegarde.data"
 #define erreur "log.txt"
 
-//ecrit dans le fichier de sauvegarde les donnees des station d'une ligne
-//les stations sont dans l'ordre, ce qui permettra de reconstituer la liste chainee lors du chargement
+/*
+structure du fichier de sauvegarde :
+    #   structure Typebus
+
+    #   entier nbr_station
+    #   nbr_station x Tstation
+
+    #   entier nbr_station
+    #   nbr_station x Tstation
+
+    #   entier nbr_station
+    #   nbr_station x Tstation
+    #   ...
+*/
+
+//ecrit dans le fichier de sauvegarde les donnees des station d'une ligne, à la suite de la structure Typebus.
+//les stations sont dans l'ordre, ce qui permettra de reconstituer la liste chainee lors du chargement.
+//la position actuelle du bus est passee en parametre afin de l'enregistrer dans le fichier.
 void sauvegardeLigne(TlisteStation ligne, TlisteStation positionBus) {
-    FILE *f_save = fopen(fichier, "wb");
+    FILE *f_save = fopen(fichier, "ab");
+    TlisteStation position = ligne;
+    int nbr_station = 0;
 
     if(f_save == NULL) {
         FILE *f_log = fopen(erreur, "w");
-        fprintf(f_log, "Erreur a l'ouverture du fichier %s\n", fichier);
+        fprintf(f_log, "Erreur a l'ouverture du fichier %s dans la fonction sauvegardeLigne\n", fichier);
         fclose(f_log);
 
         return EXIT_FAILURE;
     }
 
-    TlisteStation position = ligne;
+    //calcul du nombre de station
+    while(position->suiv != NULL) {
+        nbr_station++;
+        position = position->suiv;
+    }
+
+    //ecriture du nombre de station dans le fichier avant les stations
+    fwrite(&nbr_station, sizeof(int), 1, f_save);
 
     while(position->suiv != NULL) {
         Tstation copie = *(position->pdata);
@@ -390,15 +415,56 @@ void sauvegardeLigne(TlisteStation ligne, TlisteStation positionBus) {
     fclose(f_save);
 }
 
-//en cours de redaction
+void sauvegardeBus(Tbus bus) {
+    FILE *f_save = fopen(fichier, "wb");
+
+    if(f_save == NULL) {
+        FILE *f_log = fopen(erreur, "w");
+        fprintf(f_log, "Erreur a l'ouverture du fichier %s dans la fonction sauvegardeBus\n", fichier);
+        fclose(f_log);
+
+        return EXIT_FAILURE;
+    }
+
+    Typebus copie = *bus;
+    //suppression du pointeur pour ne pas enregistrer un pointeur incorrect
+    copie.positionSurLaLigneDeBus = NULL;
+    fwrite(&copie, sizeof(Typebus), 1, f_save);
+
+    fclose(f_save);
+}
+
+//ecrit le contenu des structures Tbus et TlisteStation dans cet ordre.
 void sauvegarde(TlisteStation ligne, Tbus bus) {
     TlisteStation positionBus = bus->positionSurLaLigneDeBus;
 
+    sauvegardeBus(bus);
     sauvegardeLigne(ligne, positionBus);
-
 }
 
 //lit dans le fichier de sauvegarde les donnees du bus et des lignes.
-void chargement() {
+void chargement(Tbus bus, TlisteStation ligne) {
+    FILE *f_save = fopen(fichier, "rb");
+    Tbus sauv_bus = NULL;
+    int nbr_station = 0;
 
+    if(f_save == NULL) {
+        FILE *f_log = fopen(erreur, "w");
+        fprintf(f_log, "Erreur a l'ouverture du fichier %s dans la fonction chargement\n", fichier);
+        fclose(f_log);
+
+        return EXIT_FAILURE;
+    }
+
+    sauv_bus = creeBus( int idBus, TlisteStation start ) fread(&(*sauv_bus), sizeof(Typebus), 1, f_save);
+
+    while(!feof(f_save)) {
+        fread(&nbr_station, sizeof(int), 1, f_save);
+
+        for(int i=0; i<nbr_station; i++) {
+
+        }
+    }
+
+    fclose(f_save);
 }
