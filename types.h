@@ -50,12 +50,14 @@ typedef T_cellule* T_liste;
 typedef T_liste TlisteStation;  //T_liste et TlisteStation sont �quivalents, cad pointeur sur Tcellule
 
 //une ligne de bus
+/*
 typedef struct{
     int idLigneBus;  //donn�e qui sera dupliqu�e dans chaque troncon de la ligne (pour aider au debugage et pour aider � la gestion des correspondances)
     char *nomLigne;
     TlisteStation depart;   //peut etre parcouru dans les deux sens
     TlisteStation arrivee;
 } TligneBus;
+*/
 
 typedef enum{ depart_vers_arrivee, arrivee_vers_depart} TsensParcours;
 

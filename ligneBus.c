@@ -397,13 +397,13 @@ int ecritureLigne(TlisteStation ligne, TlisteStation positionBus) {
         Tstation copie = *(position->pdata);
 
         //on met la valeur null dans les pointeurs pour eviter de charger des pointeur incorrects
-        copie.depart = NULL;
         copie.arrivee = NULL;
+        copie.depart = NULL;
 
-        //si le bus etait sur cet emplacement, on marque l'emplacement pour restituer la position du bus lors du chargement
-        //le pointeur prendra ensuite une valeur lors de la constitution de la liste chainee
+        //si le bus etait sur cet emplacement, on laisse une valeur dans le pointeur.
+        //le pointeur prendra ensuite une valeur valide lors de la constitution de la liste chainee
         if(position == positionBus) {
-            copie.depart = (int *)1;
+            copie.depart = &copie;
         }
 
         //ecrit le contenu de la structure Tstation dans le fichier de sauvegarde
@@ -489,16 +489,19 @@ int lectureLigne(TlisteStation ligne, Tbus bus) {
             ligne = cell;
         }
         //lie le bus a son ancienne position sur la ligne
-        if(sauv_station->depart == 1) {
+        if(sauv_station->depart) {
             bus->positionSurLaLigneDeBus = cell;
         }
         //on met l'adresse de la station precedente dans le champ depart s'il s'agit d'un troncon
-        if(sauv_station->arret_ou_troncon == TRONCON) {
+        if(getTypeNoeud(sauv_station) == TRONCON) {
             sauv_station->depart = last_station;
         }
         //on met l'adresse de la station actuelle dans le champ arrivee du troncon d'avant
-        if(sauv_station->arret_ou_troncon == ARRET && i>0) {
+        if(getTypeNoeud(sauv_station) == ARRET && i>0) {
             last_station->arrivee = sauv_station;
+            //ce NULL sert juste a eviter des problemes si le bus était arrêté ici,
+            //car on modifie le pointeur pour marquer l'emplacement du bus
+            sauv_station->depart = NULL;
         }
 
         //information de la liste chainee pour la cellule N et N-1
@@ -520,6 +523,6 @@ int lectureLigne(TlisteStation ligne, Tbus bus) {
 int chargement(Tbus bus, TlisteStation ligne) {
     lectureBus(bus);
     lectureLigne(ligne, bus);
-    
+
     return EXIT_SUCCESS;
 }
