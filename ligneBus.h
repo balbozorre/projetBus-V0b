@@ -38,9 +38,12 @@ t_date creerDate();
 int calculDistance(Tstation *a, Tstation *b);
 
 //sauvegarde et chargement via un fichier
-int sauvegardeLigne(TlisteStation ligne, TlisteStation positionBus);
-int sauvegardeBus(Tbus bus);
+int ecritureLigne(TlisteStation ligne, TlisteStation positionBus);
+int ecritureBus(Tbus bus);
 void sauvegarde(TlisteStation ligne, Tbus bus);
+
+int lectureBus(Tbus bus);
+int lectureLigne(TlisteStation ligne, Tbus bus);
 int chargement(Tbus bus, TlisteStation ligne);
 
 #endif // LIGNEBUS_H_INCLUDED

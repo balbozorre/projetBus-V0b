@@ -371,7 +371,7 @@ structure du fichier de sauvegarde :
 //ecrit dans le fichier de sauvegarde les donnees des station d'une ligne, à la suite de la structure Typebus.
 //les stations sont dans l'ordre, ce qui permettra de reconstituer la liste chainee lors du chargement.
 //la position actuelle du bus est passee en parametre afin de l'enregistrer dans le fichier.
-int sauvegardeLigne(TlisteStation ligne, TlisteStation positionBus) {
+int ecritureLigne(TlisteStation ligne, TlisteStation positionBus) {
     FILE *f_save = fopen(fichier, "ab");
     TlisteStation position = ligne;
     int nbr_station = 0;
@@ -403,9 +403,9 @@ int sauvegardeLigne(TlisteStation ligne, TlisteStation positionBus) {
         //si le bus etait sur cet emplacement, on marque l'emplacement pour restituer la position du bus lors du chargement
         //le pointeur prendra ensuite une valeur lors de la constitution de la liste chainee
         if(position == positionBus) {
-            copie.depart = 1;
+            copie.depart = (int *)1;
         }
-    
+
         //ecrit le contenu de la structure Tstation dans le fichier de sauvegarde
         fwrite(&copie, sizeof(Tstation), 1, f_save);
 
@@ -416,7 +416,7 @@ int sauvegardeLigne(TlisteStation ligne, TlisteStation positionBus) {
     return EXIT_SUCCESS;
 }
 
-int sauvegardeBus(Tbus bus) {
+int ecritureBus(Tbus bus) {
     FILE *f_save = fopen(fichier, "wb");
 
     if(f_save == NULL) {
@@ -440,12 +440,27 @@ int sauvegardeBus(Tbus bus) {
 void sauvegarde(TlisteStation ligne, Tbus bus) {
     TlisteStation positionBus = bus->positionSurLaLigneDeBus;
 
-    sauvegardeBus(bus);
-    sauvegardeLigne(ligne, positionBus);
+    ecritureBus(bus);
+    ecritureLigne(ligne, positionBus);
 }
 
-//lit dans le fichier de sauvegarde les donnees du bus et des lignes.
-int chargement(Tbus bus, TlisteStation ligne) {
+int lectureBus(Tbus bus) {
+    FILE *f_save = fopen(fichier, "rb");
+
+    if(f_save == NULL) {
+        FILE *f_log = fopen(erreur, "w");
+        fprintf(f_log, "Erreur a l'ouverture du fichier %s dans la fonction chargement\n", fichier);
+        fclose(f_log);
+        return EXIT_FAILURE;
+    }
+
+    fread(bus, sizeof(Tbus), 1, f_save);;
+
+    fclose(f_save);
+    return EXIT_SUCCESS;
+}
+
+int lectureLigne(TlisteStation ligne, Tbus bus) {
     FILE *f_save = fopen(fichier, "rb");
     int nbr_station = 0;
     Tstation *last_station = NULL;
@@ -455,16 +470,11 @@ int chargement(Tbus bus, TlisteStation ligne) {
         FILE *f_log = fopen(erreur, "w");
         fprintf(f_log, "Erreur a l'ouverture du fichier %s dans la fonction chargement\n", fichier);
         fclose(f_log);
-
         return EXIT_FAILURE;
     }
 
-    fread(bus, sizeof(Tbus), 1, f_save);;
-
     effacerListe(ligne);
-
     fread(&nbr_station, sizeof(int), 1, f_save);
-    //TlisteStation sauv_ligne = (T_cellule *)malloc(sizeof(T_cellule));
 
     //cette boucle va lire chaque station de la ligne dans le fichier, puis recreer la liste
     //chainee a partir de ces informations
@@ -474,8 +484,11 @@ int chargement(Tbus bus, TlisteStation ligne) {
 
         fread(sauv_station, sizeof(Tstation), 1, f_save);
 
-        if(i == 0) {ligne = cell;}
-        //lie le bus a son ancienne position sur le ligne
+        //associe la liste chainee a la variable de la ligne passee en parametre
+        if(i == 0) {
+            ligne = cell;
+        }
+        //lie le bus a son ancienne position sur la ligne
         if(sauv_station->depart == 1) {
             bus->positionSurLaLigneDeBus = cell;
         }
@@ -498,6 +511,15 @@ int chargement(Tbus bus, TlisteStation ligne) {
         last_station = sauv_station;
         last_cell = cell;
     }
+    
     fclose(f_save);
+    return EXIT_SUCCESS;
+}
+
+//lit dans le fichier de sauvegarde les donnees du bus et des lignes.
+int chargement(Tbus bus, TlisteStation ligne) {
+    lectureBus(bus);
+    lectureLigne(ligne, bus);
+    
     return EXIT_SUCCESS;
 }
