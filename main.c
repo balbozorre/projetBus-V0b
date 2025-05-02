@@ -1,5 +1,5 @@
-//NOM pr�nom �tudiant 1 : 
-//NOM pr�nom �tudiant 2 : 
+//NOM pr�nom �tudiant 1 :
+//NOM pr�nom �tudiant 2 :
 
 #include "SDL.h"
 #include "maSDL.h"
@@ -7,6 +7,7 @@
 
 #include "types.h"
 #include "ligneBus.h"
+#include "tri.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -66,6 +67,10 @@ int main(int argc, char* argv[])
         afficheConsoleLigneBus(ligne1);
         afficheConsoleLigneBus(ligne2);
         afficheConsoleLigneBus(ligne3);
+
+        concatenationLignes(ligne1, ligne2);
+
+        afficher_liste(ligne1);
 
         //Current animation frame
         int frame = 0;

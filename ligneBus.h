@@ -46,4 +46,6 @@ int lectureBus(Tbus bus);
 int lectureLigne(TlisteStation ligne, Tbus bus);
 int chargement(Tbus bus, TlisteStation ligne);
 
+int concatenationLignes(TlisteStation A, TlisteStation B);
+
 #endif // LIGNEBUS_H_INCLUDED

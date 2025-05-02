@@ -384,17 +384,26 @@ int ecritureLigne(TlisteStation ligne, TlisteStation positionBus) {
         return EXIT_FAILURE;
     }
 
+    printf("\nok6\n");
+
     //calcul du nombre de station
     while(position != NULL) {
         nbr_station++;
         position = position->suiv;
     }
 
+    position = ligne;
+
     //ecriture du nombre de station dans le fichier avant les stations
     fwrite(&nbr_station, sizeof(int), 1, f_save);
 
-    while(position->suiv != NULL) {
+    printf("\nok7\n");
+    int nbr = 0;
+
+    while(position != NULL) {
         Tstation copie = *(position->pdata);
+        nbr++;
+        printf("sauvegarde station %d\n", nbr);
 
         //on met la valeur null dans les pointeurs pour eviter de charger des pointeur incorrects
         copie.arrivee = NULL;
@@ -427,10 +436,15 @@ int ecritureBus(Tbus bus) {
         return EXIT_FAILURE;
     }
 
+    printf("\nok1\n");
+
     Typebus copie = *bus;
+    printf("\nok2\n");
     //suppression du pointeur pour ne pas enregistrer un pointeur incorrect
     copie.positionSurLaLigneDeBus = NULL;
+    printf("\nok3\n");
     fwrite(&copie, sizeof(Typebus), 1, f_save);
+    printf("\nok4\n");
 
     fclose(f_save);
     return EXIT_SUCCESS;
@@ -439,8 +453,9 @@ int ecritureBus(Tbus bus) {
 //ecrit le contenu des structures Tbus et TlisteStation dans cet ordre.
 void sauvegarde(TlisteStation ligne, Tbus bus) {
     TlisteStation positionBus = bus->positionSurLaLigneDeBus;
-
+    printf("\nok-1\n");
     ecritureBus(bus);
+    printf("\nok5\n");
     ecritureLigne(ligne, positionBus);
 }
 
@@ -514,7 +529,7 @@ int lectureLigne(TlisteStation ligne, Tbus bus) {
         last_station = sauv_station;
         last_cell = cell;
     }
-    
+
     fclose(f_save);
     return EXIT_SUCCESS;
 }
@@ -523,6 +538,55 @@ int lectureLigne(TlisteStation ligne, Tbus bus) {
 int chargement(Tbus bus, TlisteStation ligne) {
     lectureBus(bus);
     lectureLigne(ligne, bus);
+
+    return EXIT_SUCCESS;
+}
+
+
+//############################## question 5 #########################################
+
+
+int concatenationLignes(TlisteStation A, TlisteStation B) {
+    if(B == NULL || B->pdata == NULL || A == NULL || A->pdata == NULL) {
+        FILE *f_log = fopen(erreur, "w");
+        fprintf(f_log, "erreur dans concatenation Lignes : l'une des lignes ne contient rien\n");
+        fclose(f_log);
+
+        return EXIT_FAILURE;
+    }
+
+    TlisteStation pos = A;
+
+    while(pos->suiv != NULL) {
+        pos = pos->suiv;
+    }
+
+    Tstation *troncon = NULL;
+    Tstation *data = getPtrData(pos);
+
+    if(data->arret_ou_troncon == TRONCON) {
+        FILE *f_log = fopen(erreur, "w");
+        fprintf(f_log, "erreur dans concatenationLignes : la ligne se termine par un troncon\n");
+        fclose(f_log);
+
+        return EXIT_FAILURE;
+    }
+    else if(data->arret_ou_troncon == ARRET && pos->prec != NULL && B->pdata->arret_ou_troncon == ARRET) {
+        Tstation *prec_troncon = pos->prec->pdata;
+        troncon = creeTroncon(
+            getIdLigneTroncon(prec_troncon),
+            pos->pdata,
+            B->pdata,
+            calculDistance(pos->pdata, B->pdata),
+            calculDistance(pos->pdata, B->pdata),
+            getRandomValue(10, 100),
+            creerDate()
+        );
+
+        B = ajoutEnTete(B, troncon);
+        B->prec = pos;
+        pos->suiv = B;
+    }
 
     return EXIT_SUCCESS;
 }
