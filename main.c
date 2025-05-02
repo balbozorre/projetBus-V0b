@@ -1,5 +1,5 @@
-//NOM pr�nom �tudiant 1 :
-//NOM pr�nom �tudiant 2 :
+//NOM pr�nom �tudiant 1 : loic petiot
+//NOM pr�nom �tudiant 2 : heribert mbonimpa
 
 #include "SDL.h"
 #include "maSDL.h"
@@ -69,6 +69,10 @@ int main(int argc, char* argv[])
         afficheConsoleLigneBus(ligne3);
 
         concatenationLignes(ligne1, ligne2);
+
+        afficher_liste(ligne1);
+
+        supprimerStation(ligne1, bus1, 2);
 
         afficher_liste(ligne1);
 

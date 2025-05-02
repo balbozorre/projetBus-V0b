@@ -58,6 +58,18 @@ T_liste ajoutEnTete(T_liste l, Tstation* mydata){
     return nouv;
 }
 
+int liaison(T_liste a, T_liste b) {
+    if(a == NULL || b == NULL) {
+        printf("erreur dans la fonction liaison : liste vide\n");
+        return EXIT_FAILURE;
+    }
+    else {
+        a->suiv = b;
+        b->prec = a;
+        return EXIT_SUCCESS;
+    }
+}
+
 T_liste ajoutEnFin(T_liste l, Tstation* mydata){
     T_liste nouv, courant=l;  //remarque: pas de malloc si on appelle ajoutEnTete
 
@@ -113,3 +125,4 @@ T_liste getPrevCell(T_liste l){
 }
 
 //A vous la suite si besoin
+

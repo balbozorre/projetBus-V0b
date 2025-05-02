@@ -353,6 +353,17 @@ void afficheCoordonneesBus( Tbus myBus ){
 #define fichier "sauvegarde.data"
 #define erreur "log.txt"
 
+/**
+Ecrit un message d'erreur dans le fichier erreur.
+fonction : L'identifiant de la fonction
+message : La raison de l'erreur
+**/
+void logErreur(const char *fonction, const char *message) {
+    FILE *f_log = fopen(erreur, "a");
+    fprintf(f_log, "Erreur dans la fonction %s : %s\n", fonction, message);
+    fclose(f_log);
+}
+
 /*
 structure du fichier de sauvegarde :
     #   structure Typebus
@@ -377,11 +388,7 @@ int ecritureLigne(TlisteStation ligne, TlisteStation positionBus) {
     int nbr_station = 0;
 
     if(f_save == NULL) {
-        FILE *f_log = fopen(erreur, "w");
-        fprintf(f_log, "Erreur a l'ouverture du fichier %s dans la fonction sauvegardeLigne\n", fichier);
-        fclose(f_log);
-
-        return EXIT_FAILURE;
+        logErreur("sauvegardeLigne", "Erreur a l'ouverture du fichier");
     }
 
     printf("\nok6\n");
@@ -429,11 +436,7 @@ int ecritureBus(Tbus bus) {
     FILE *f_save = fopen(fichier, "wb");
 
     if(f_save == NULL) {
-        FILE *f_log = fopen(erreur, "w");
-        fprintf(f_log, "Erreur a l'ouverture du fichier %s dans la fonction sauvegardeBus\n", fichier);
-        fclose(f_log);
-
-        return EXIT_FAILURE;
+        logErreur("sauvegardeBus", "Erreur a l'ouverture du fichier");
     }
 
     printf("\nok1\n");
@@ -463,10 +466,7 @@ int lectureBus(Tbus bus) {
     FILE *f_save = fopen(fichier, "rb");
 
     if(f_save == NULL) {
-        FILE *f_log = fopen(erreur, "w");
-        fprintf(f_log, "Erreur a l'ouverture du fichier %s dans la fonction chargement\n", fichier);
-        fclose(f_log);
-        return EXIT_FAILURE;
+        logErreur("chargement", "Erreur a l'ouverture du fichier");
     }
 
     fread(bus, sizeof(Tbus), 1, f_save);;
@@ -482,10 +482,7 @@ int lectureLigne(TlisteStation ligne, Tbus bus) {
     TlisteStation last_cell = NULL;
 
     if(f_save == NULL) {
-        FILE *f_log = fopen(erreur, "w");
-        fprintf(f_log, "Erreur a l'ouverture du fichier %s dans la fonction chargement\n", fichier);
-        fclose(f_log);
-        return EXIT_FAILURE;
+        logErreur("chargement", "Erreur a l'ouverture du fichier");
     }
 
     effacerListe(ligne);
@@ -548,11 +545,7 @@ int chargement(Tbus bus, TlisteStation ligne) {
 
 int concatenationLignes(TlisteStation A, TlisteStation B) {
     if(B == NULL || B->pdata == NULL || A == NULL || A->pdata == NULL) {
-        FILE *f_log = fopen(erreur, "w");
-        fprintf(f_log, "erreur dans concatenation Lignes : l'une des lignes ne contient rien\n");
-        fclose(f_log);
-
-        return EXIT_FAILURE;
+        logErreur("concatenationLignes", "l'une des lignes ne contient rien");
     }
 
     TlisteStation pos = A;
@@ -565,11 +558,7 @@ int concatenationLignes(TlisteStation A, TlisteStation B) {
     Tstation *data = getPtrData(pos);
 
     if(data->arret_ou_troncon == TRONCON) {
-        FILE *f_log = fopen(erreur, "w");
-        fprintf(f_log, "erreur dans concatenationLignes : la ligne se termine par un troncon\n");
-        fclose(f_log);
-
-        return EXIT_FAILURE;
+        logErreur("concatenationLignes", "la ligne se termine par un troncon");
     }
     else if(data->arret_ou_troncon == ARRET && pos->prec != NULL && B->pdata->arret_ou_troncon == ARRET) {
         Tstation *prec_troncon = pos->prec->pdata;
@@ -586,7 +575,128 @@ int concatenationLignes(TlisteStation A, TlisteStation B) {
         B = ajoutEnTete(B, troncon);
         B->prec = pos;
         pos->suiv = B;
+
+        //remplacement de l'id de ligne de la ligne B
+        int id = pos->pdata->idLigneBus;
+        while(pos != NULL) {
+            pos = pos->suiv;
+            if(getTypeNoeud(pos->pdata) == TRONCON) {
+                pos->pdata->idLigneBus = id;
+            }
+        }
     }
 
+    return EXIT_SUCCESS;
+}
+
+T_liste supprimerDebut(T_liste l) {
+    if (l==NULL) {
+        return NULL;
+    }
+    else {
+        T_liste next = getNextCell(l);
+        if(next) {
+            next->prec = NULL;
+        }
+        free(l->pdata);
+        free(l);
+        return next;
+    }
+}
+
+T_liste supprimerFin(T_liste l) {
+    if (l==NULL) {
+        return NULL;
+    }
+
+    T_liste pos = l;
+    while(pos->suiv != NULL) {
+        pos = getNextCell(pos);
+    }
+
+    if(pos == l) {
+        if (pos->pdata) {
+            free(pos->pdata);
+        }
+        free(pos);
+        return NULL;
+    }
+
+    T_liste avantDernier = getPrevCell(pos);
+    if(avantDernier) {
+        avantDernier->suiv = NULL;
+    }
+
+    if(pos->pdata) {
+        free(pos->pdata);
+    }
+
+    free(pos);
+    return l;
+}
+
+int supprimerStation(TlisteStation ligne, Tbus bus, int indice) {
+    if(ligne == NULL) {
+        logErreur("supprimerStation", "la ligne est vide");
+        return EXIT_FAILURE;
+    }
+    else if(indice < 1) {
+        logErreur("supprimerStation", "indice invalide");
+        return EXIT_FAILURE;
+    }
+    else {
+        TlisteStation pos = ligne;
+        for(int i = 1; i<indice; i++) {
+            pos = getNextStation(pos);
+        }
+
+        if(pos == NULL) {
+            logErreur("supprimerStation", "l'indice depasse de la liste");
+        }
+        else {
+            TlisteStation nextStation = getNextStation(pos);
+            TlisteStation prevStation = getPreviousStation(pos);
+            TlisteStation nextTroncon = getNextTroncon(pos);
+            TlisteStation prevTroncon = pos->prec;
+
+            if(prevStation == NULL && nextStation) {
+                ligne = supprimerDebut(ligne);
+                ligne = supprimerDebut(ligne);
+                bus->positionSurLaLigneDeBus = ligne;
+            }
+            else if(prevStation && nextStation == NULL) {
+                ligne = supprimerFin(ligne);
+                ligne = supprimerFin(ligne);
+                bus->positionSurLaLigneDeBus = ligne;
+            }
+            else if(prevStation && nextStation) {
+                int distanceTemps = calculDistance(prevStation->pdata, nextStation->pdata);
+                T_liste nouv = (T_liste)malloc(sizeof(struct T_cell));
+                Tstation *newTroncon = creeTroncon(
+                    getIdLigneTroncon(nextTroncon),
+                    prevStation->pdata,
+                    nextStation->pdata,
+                    distanceTemps,
+                    distanceTemps,
+                    getRandomValue(10, 100),
+                    creerDate()
+                );
+                nouv->pdata = newTroncon;
+                nouv->prec = prevStation;
+                nouv->suiv = nextStation;
+                free(nextTroncon->pdata);
+                free(prevTroncon->pdata);
+                free(nextTroncon);
+                free(prevTroncon);
+                free(pos->pdata);
+                free(pos);
+            }
+            else {
+                free(pos->pdata);
+                free(pos);
+                ligne = NULL;
+            }
+        }
+    }
     return EXIT_SUCCESS;
 }

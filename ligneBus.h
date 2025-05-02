@@ -47,5 +47,8 @@ int lectureLigne(TlisteStation ligne, Tbus bus);
 int chargement(Tbus bus, TlisteStation ligne);
 
 int concatenationLignes(TlisteStation A, TlisteStation B);
+T_liste supprimerDebut(T_liste l);
+T_liste supprimerFin(T_liste l);
+int supprimerStation(TlisteStation ligne, Tbus bus, int indice);
 
 #endif // LIGNEBUS_H_INCLUDED
