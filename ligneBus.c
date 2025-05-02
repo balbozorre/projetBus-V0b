@@ -456,7 +456,9 @@ void chargement(Tbus bus, TlisteStation ligne) {
         return EXIT_FAILURE;
     }
 
+    /*
     sauv_bus = creeBus( int idBus, TlisteStation start ) fread(&(*sauv_bus), sizeof(Typebus), 1, f_save);
+    */
 
     while(!feof(f_save)) {
         fread(&nbr_station, sizeof(int), 1, f_save);
