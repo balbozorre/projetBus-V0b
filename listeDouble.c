@@ -4,11 +4,24 @@
 #include "listeDouble.h"
 
 
-//initListe ne fait pas de malloc, juste une initialisation à NULL du pointeur de liste
+//initListe ne fait pas de malloc, juste une initialisation ï¿½ NULL du pointeur de liste
 void initListe(T_liste *l){
 *l=NULL;
 }
 
+void effacerListe(T_liste l) {
+    T_cellule* courant = l;
+    while (courant != NULL) {
+        T_cellule* suivant = courant->suiv;
+
+        if (courant->pdata != NULL) {
+            free(courant->pdata);
+        }
+
+        free(courant);
+        courant = suivant;
+    }
+}
 
 bool listeVide( T_liste l){
     return (l==NULL);
@@ -25,15 +38,15 @@ void afficheListe( T_liste l){
 T_liste ajoutEnTete(T_liste l, Tstation* mydata){
     T_liste nouv = (T_liste)malloc(sizeof(struct T_cell));
 
-    //CHANGEMENT par rapport à la partie2 d'updago
-    //nouv->pdata = (int*)malloc(sizeof(int)); ATTENTION PLUS DE RECOPIE de mydata, donc plus d'allocation mémoire sur ce champ
+    //CHANGEMENT par rapport ï¿½ la partie2 d'updago
+    //nouv->pdata = (int*)malloc(sizeof(int)); ATTENTION PLUS DE RECOPIE de mydata, donc plus d'allocation mï¿½moire sur ce champ
 
     //SIMPLE BRANCHEMENT EN MEMOIRE ENTRE POINTEURS (SUR LA STATION EXISTANTE)
     nouv->pdata=mydata;
 
     if (l==NULL) // on cree en fait la premiere cellule de la liste
     {
-        nouv->suiv = NULL;  //sécurise la présence de NULL sur le champ suiv, au cas où le ptr l n'aurait pas été  initialisé correctement via initListe
+        nouv->suiv = NULL;  //sï¿½curise la prï¿½sence de NULL sur le champ suiv, au cas oï¿½ le ptr l n'aurait pas ï¿½tï¿½  initialisï¿½ correctement via initListe
         nouv->prec = NULL;
     }
     else  // la lste n'etait pas vide, on doit donc faire les branchements
@@ -52,7 +65,7 @@ T_liste ajoutEnFin(T_liste l, Tstation* mydata){
     {
         return ajoutEnTete(l, mydata);
     }
-    else  // la liste n'etant pas vide,déplacment sur la derniere cellule, malloc et branchements
+    else  // la liste n'etant pas vide,dï¿½placment sur la derniere cellule, malloc et branchements
     {
         while (courant->suiv != NULL){
             courant=courant->suiv;
@@ -64,13 +77,13 @@ T_liste ajoutEnFin(T_liste l, Tstation* mydata){
         nouv->prec = courant;
         courant->suiv = nouv;
     }
-    return l;  //la tête d'origine, qui n'a pas changé
+    return l;  //la tï¿½te d'origine, qui n'a pas changï¿½
 }
 
 Tstation* getPtrData(T_liste l){
     if (l==NULL)
     {
-        printf("\nERREUR ptr pdata non alloué");
+        printf("\nERREUR ptr pdata non allouï¿½");
         return NULL;
     }
     else

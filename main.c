@@ -130,6 +130,15 @@ int main(int argc, char* argv[])
                         printf("\nTouche ECHAP");
                         cont = 0;  //sortie de la boucle
                 }
+                if ( pKeyStates[SDL_SCANCODE_9] ){
+                    printf("\nTouche 9, sauvegarde en cours...\n");
+                    sauvegarde(ligne1, bus1);
+                    printf("\nsauvegarde terminée\n");
+                }
+                if ( pKeyStates[SDL_SCANCODE_0] ){
+                    printf("\nTouche 0, chargement\n");
+                    
+                }
 
 
                 //affichage du jeu � chaque tour

@@ -385,7 +385,7 @@ void sauvegardeLigne(TlisteStation ligne, TlisteStation positionBus) {
     }
 
     //calcul du nombre de station
-    while(position->suiv != NULL) {
+    while(position != NULL) {
         nbr_station++;
         position = position->suiv;
     }
@@ -445,8 +445,9 @@ void sauvegarde(TlisteStation ligne, Tbus bus) {
 //lit dans le fichier de sauvegarde les donnees du bus et des lignes.
 void chargement(Tbus bus, TlisteStation ligne) {
     FILE *f_save = fopen(fichier, "rb");
-    Tbus sauv_bus = NULL;
     int nbr_station = 0;
+    Tstation *last_station = NULL;
+    TlisteStation last_cell = NULL;
 
     if(f_save == NULL) {
         FILE *f_log = fopen(erreur, "w");
@@ -456,21 +457,45 @@ void chargement(Tbus bus, TlisteStation ligne) {
         return EXIT_FAILURE;
     }
 
+    //Tbus sauv_bus = NULL;
+    fread(bus, sizeof(Tbus), 1, f_save);;
+
+    effacerListe(ligne);
+
     //to-do
     //besoin de corriger l'enregistrement de la structure tbus
     //il faut lier le bus a sa position en verifiant le pointeur suivant pour trouver un 1
-    //il faut reconstruire la liste chainee, avec une boucle for apres avoir lu le nbr de station
-    /*
-    sauv_bus = creeBus( int idBus, TlisteStation start ) fread(&(*sauv_bus), sizeof(Typebus), 1, f_save);
-    */
 
-    while(!feof(f_save)) {
-        fread(&nbr_station, sizeof(int), 1, f_save);
+    fread(&nbr_station, sizeof(int), 1, f_save);
+    TlisteStation sauv_ligne = (T_cellule *)malloc(sizeof(T_cellule));
 
-        for(int i=0; i<nbr_station; i++) {
+    for(int i=0; i<nbr_station; i++) {
+        
+        Tstation *sauv_station = (Tstation *)malloc(sizeof(Tstation));
+        fread(sauv_station, sizeof(Tstation), 1, f_save);
 
+        if(sauv_station->depart == 1) {
+            bus->positionSurLaLigneDeBus = sauv_ligne;
         }
+        //on met l'adresse de la station precedente dans le champ depart s'il s'agit d'un troncon
+        if(sauv_station->arret_ou_troncon == TRONCON) {
+            sauv_station->depart = last_station;
+        }
+        //on met l'adresse de la station actuelle dans le champ arrivee du troncon d'avant
+        if(sauv_station->arret_ou_troncon == ARRET && i>0) {
+            last_station->arrivee = sauv_station;
+        }
+
+        T_cellule* cell = malloc(sizeof(T_cellule));
+        cell->pdata = sauv_station;
+        cell->suiv = NULL;
+        cell->prec = last_cell;
+        //sauv_ligne = ajoutEnFin(sauv_ligne, sauv_station);
+
+        last_station = sauv_station;
     }
+
+    //precedente = NULL;
 
     fclose(f_save);
 }
