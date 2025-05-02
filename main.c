@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
                 }
                 if ( pKeyStates[SDL_SCANCODE_0] ){
                     printf("\nTouche 0, chargement\n");
-                    
+                    chargement(bus1, ligne1);
                 }
 
 

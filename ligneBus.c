@@ -371,7 +371,7 @@ structure du fichier de sauvegarde :
 //ecrit dans le fichier de sauvegarde les donnees des station d'une ligne, à la suite de la structure Typebus.
 //les stations sont dans l'ordre, ce qui permettra de reconstituer la liste chainee lors du chargement.
 //la position actuelle du bus est passee en parametre afin de l'enregistrer dans le fichier.
-void sauvegardeLigne(TlisteStation ligne, TlisteStation positionBus) {
+int sauvegardeLigne(TlisteStation ligne, TlisteStation positionBus) {
     FILE *f_save = fopen(fichier, "ab");
     TlisteStation position = ligne;
     int nbr_station = 0;
@@ -413,9 +413,10 @@ void sauvegardeLigne(TlisteStation ligne, TlisteStation positionBus) {
     }
 
     fclose(f_save);
+    return EXIT_SUCCESS;
 }
 
-void sauvegardeBus(Tbus bus) {
+int sauvegardeBus(Tbus bus) {
     FILE *f_save = fopen(fichier, "wb");
 
     if(f_save == NULL) {
@@ -432,6 +433,7 @@ void sauvegardeBus(Tbus bus) {
     fwrite(&copie, sizeof(Typebus), 1, f_save);
 
     fclose(f_save);
+    return EXIT_SUCCESS;
 }
 
 //ecrit le contenu des structures Tbus et TlisteStation dans cet ordre.
@@ -443,7 +445,7 @@ void sauvegarde(TlisteStation ligne, Tbus bus) {
 }
 
 //lit dans le fichier de sauvegarde les donnees du bus et des lignes.
-void chargement(Tbus bus, TlisteStation ligne) {
+int chargement(Tbus bus, TlisteStation ligne) {
     FILE *f_save = fopen(fichier, "rb");
     int nbr_station = 0;
     Tstation *last_station = NULL;
@@ -457,25 +459,25 @@ void chargement(Tbus bus, TlisteStation ligne) {
         return EXIT_FAILURE;
     }
 
-    //Tbus sauv_bus = NULL;
     fread(bus, sizeof(Tbus), 1, f_save);;
 
     effacerListe(ligne);
 
-    //to-do
-    //besoin de corriger l'enregistrement de la structure tbus
-    //il faut lier le bus a sa position en verifiant le pointeur suivant pour trouver un 1
-
     fread(&nbr_station, sizeof(int), 1, f_save);
-    TlisteStation sauv_ligne = (T_cellule *)malloc(sizeof(T_cellule));
+    //TlisteStation sauv_ligne = (T_cellule *)malloc(sizeof(T_cellule));
 
+    //cette boucle va lire chaque station de la ligne dans le fichier, puis recreer la liste
+    //chainee a partir de ces informations
     for(int i=0; i<nbr_station; i++) {
-        
         Tstation *sauv_station = (Tstation *)malloc(sizeof(Tstation));
+        T_cellule* cell = malloc(sizeof(T_cellule));
+
         fread(sauv_station, sizeof(Tstation), 1, f_save);
 
+        if(i == 0) {ligne = cell;}
+        //lie le bus a son ancienne position sur le ligne
         if(sauv_station->depart == 1) {
-            bus->positionSurLaLigneDeBus = sauv_ligne;
+            bus->positionSurLaLigneDeBus = cell;
         }
         //on met l'adresse de la station precedente dans le champ depart s'il s'agit d'un troncon
         if(sauv_station->arret_ou_troncon == TRONCON) {
@@ -486,16 +488,16 @@ void chargement(Tbus bus, TlisteStation ligne) {
             last_station->arrivee = sauv_station;
         }
 
-        T_cellule* cell = malloc(sizeof(T_cellule));
+        //information de la liste chainee pour la cellule N et N-1
         cell->pdata = sauv_station;
         cell->suiv = NULL;
         cell->prec = last_cell;
-        //sauv_ligne = ajoutEnFin(sauv_ligne, sauv_station);
+        last_cell->suiv = cell;
 
+        //mise a jour des pointeurs pour la cellule N-1
         last_station = sauv_station;
+        last_cell = cell;
     }
-
-    //precedente = NULL;
-
     fclose(f_save);
+    return EXIT_SUCCESS;
 }
